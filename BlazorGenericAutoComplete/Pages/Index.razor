@@ -1,9 +1,52 @@
 ﻿@page "/"
+@using BlazorGenericAutoComplete.Components
+@using BlazorGenericAutoComplete.Models;
+@inject IConfiguration Configuration
 
 <PageTitle>Index</PageTitle>
 
 <h1>Hello, world!</h1>
 
-Welcome to your new app.
+<AutocompleteComponent Items="Tareas"
+                       TItem="Tarea"
+                       OnSelectItem="@((tarea) => { SelectedTask = tarea; Tareas = null; })"
+                       SelectedValue="@(SelectedTask?.name)"
+                       Context="product"
+                       ApiUrl=@($"{apiURL}tasks?name_like=")>
+    <OptionTemplate>
+        <span class="option-text">@product.name</span>
+    </OptionTemplate>
+    <ResultsTemplate>
+        @if (SelectedTask != null)
+        {
+            <p class="mt-3">
+                You selected <strong>@SelectedTask.name</strong>
+                with ID <strong>@SelectedTask.id</strong>
+            </p>
+        }
+    </ResultsTemplate>
+</AutocompleteComponent>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+@code {
+    // List<Customer>? Customers;
+    // Customer? SelectedCustomer;
+    private string strValue;
+    private string apiURL;
+    List<Tarea>? Tareas;
+    Tarea? SelectedTask;
+    /// <summary>
+    /// OnInitialized method
+    /// </summary>
+    protected override void OnInitialized()
+    {
+        strValue = Configuration.GetSection("MySection").Value!;
+        apiURL = Configuration.GetSection("Services")["apiURL"]!;
+        //apiURL = apiURL + "tasks?name_like";
+    }
+
+    // void SelectCustomer(Customer customer)
+    // {
+    //     SelectedCustomer = customer;
+    //     Customers = null;
+    // }
+}

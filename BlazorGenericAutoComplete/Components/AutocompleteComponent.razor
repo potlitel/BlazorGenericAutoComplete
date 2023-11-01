@@ -16,7 +16,14 @@
             }
             else
             {
-                <li class="disabled option">No results</li>
+                if (NoResultsTemplate is not null)
+                {
+                    @NoResultsTemplate
+                }
+                else
+                {
+                    <li class="disabled option">No results</li>
+                }
             }
         </ul>
     }
@@ -43,6 +50,11 @@
     /// </summary>
     [Parameter]
     public RenderFragment? ResultsTemplate { get; set; }
+    /// <summary>
+    /// No Results template to customize the result search process
+    /// </summary>
+    [Parameter]
+    public RenderFragment? NoResultsTemplate { get; set; }
     /// <summary>
     /// Option template to customize display item template
     /// </summary>
