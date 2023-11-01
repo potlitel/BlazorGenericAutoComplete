@@ -1,0 +1,81 @@
+﻿@typeparam TItem
+@inject HttpClient http
+<div class="autocomplete w-25">
+    <input @bind=SelectedValue @oninput=HandleInput class="form-control filter" />
+    @if (Items is not null)
+    {
+        <ul class="options">
+            @if (Items.Any())
+            {
+                @foreach (var item in Items)
+                {
+                    <li class="option" @onclick="_ => SelectItem(item)">
+                        @OptionTemplate(item)
+                    </li>
+                }
+            }
+            else
+            {
+                <li class="disabled option">No results</li>
+            }
+        </ul>
+    }
+</div>
+@ResultsTemplate
+@code {
+    /// <summary>
+    /// A items collection to display
+    /// </summary>
+    [Parameter, EditorRequired]
+    public IEnumerable<TItem>? Items { get; set; }
+    /// <summary>
+    /// OnSelectItem event callback
+    /// </summary>
+    [Parameter, EditorRequired]
+    public EventCallback<TItem> OnSelectItem { get; set; }
+    /// <summary>
+    /// SelectedValue
+    /// </summary>
+    [Parameter]
+    public string? SelectedValue { get; set; }
+    /// <summary>
+    /// Results template to customize the result search process
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ResultsTemplate { get; set; }
+    /// <summary>
+    /// Option template to customize display item template
+    /// </summary>
+    [Parameter, EditorRequired]
+    public RenderFragment<TItem> OptionTemplate { get; set; } = default!;
+    /// <summary>
+    /// Api url from data was readed
+    /// </summary>
+    [Parameter, EditorRequired]
+    public string? ApiUrl { get; set; }
+
+    string? filter;
+    /// <summary>
+    /// HandleInput event
+    /// </summary>
+    /// <param name="e"></param>
+    /// <returns></returns>
+    async Task HandleInput(ChangeEventArgs e)
+    {
+        filter = e.Value?.ToString();
+        if (filter?.Length > 2)
+        {
+            Items = await http.GetFromJsonAsync<IEnumerable<TItem>>($"{ApiUrl}{filter}");
+        }
+        else
+        {
+            Items = null;
+        }
+    }
+    /// <summary>
+    /// SelectItem event callback
+    /// </summary>
+    /// <param name="item">TItem value</param>
+    /// <returns></returns>
+    async Task SelectItem(TItem item) => await OnSelectItem.InvokeAsync(item);
+}
