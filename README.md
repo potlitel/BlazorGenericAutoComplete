@@ -26,4 +26,4 @@
    json-server --watch db.json --port 3004
    ```
 
-4. Finally, un the blazor app.
+4. Finally, run the blazor app.
